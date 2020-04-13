@@ -3,6 +3,9 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 
+// const AuthenticationValidation = require('../validations/AuthenticationValidation')
+const Joi = require('joi');
+
 router.get('/', (req, res) => {
   res.send({
     message: 'hello there',
@@ -53,17 +56,72 @@ router.patch('/:userId', async (req, res) => {
 
 // Register a user
 router.post('/registration', async (req, res) => {
-  console.log(req.body);
-  const user = new User({
-    username: req.body.username,
-    password: req.body.password,
-    email: req.body.email,
-  });
+  const schema = {
+    email: Joi.string().email(),
+    username: Joi.string(),
+    password: Joi.string().min(8).max(32),
+  };
+  const { error, value } = Joi.validate(req.body, schema);
+  if (error) {
+    switch (error.details[0].context.key) {
+      case 'email':
+        res.status(400).send({
+          error: 'not valid email',
+        });
+        break;
+      case 'username':
+        res.status(400).send({
+          error: 'username must be string',
+        });
+        break;
+      case 'password':
+        res.status(400).send({
+          error: 'password must be long 8-32 characters.',
+        });
+        break;
+      default:
+        res.status(400).send({
+          error: 'invalid registration information',
+        });
+    }
+  } else {
+    const user = new User({
+      username: req.body.username,
+      password: req.body.password,
+      email: req.body.email,
+    });
+    try {
+      const savedUser = await user.save();
+      res.json({ credentials: savedUser, status: 'ok' });
+    } catch (err) {
+      res.json({ message: err });
+    }
+  }
+});
+
+//login user
+router.post('/login', async (req, res) => {
   try {
-    const savedUser = await user.save();
-    res.json({credentials: savedUser, status: 'ok'});
+    const { username, password } = req.body;
+    // const user = new User({
+    //   username: req.body.username,
+    //   password: req.body.password,
+    //   email: req.body.email,
+    // });
+    const user = await User.findOne({ username: username });
+    const passwordValid = password === user.password;
+    if (!user || !passwordValid) {
+      return res.status(403).send({
+        error: 'The login information was incorrect',
+      });
+    }
+    res.send({
+      user: user.toJSON(),
+    });
   } catch (err) {
-    res.json({ message: err });
+    res.status(500).send({
+      error: 'Error occured',
+    });
   }
 });
 
