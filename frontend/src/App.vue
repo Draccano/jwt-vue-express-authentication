@@ -1,10 +1,20 @@
 <template>
   <div id="app">
-    <div id="bg-gray-100 h-screen">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+    <div id="bg-gray-100" class="h-16">
+      <div>
+        <div class="flex justify-end text-right px-4 py-4 m-2 text-base">
+          <div class="flex">
+            <div class="px-3 text-gray-700 rounded-sm hover:bg-gray-200">
+              <router-link to="/login">Login</router-link>
+            </div>
+            <div class="px-3 rounded-sm text-gray-700  hover:bg-gray-200">
+              <router-link to="/registration">Registration</router-link>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <router-view/>
+    <router-view />
   </div>
 </template>
 
