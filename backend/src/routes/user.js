@@ -2,9 +2,21 @@ const express = require('express');
 
 const router = express.Router();
 const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+require('dotenv/config');
+
 
 // const AuthenticationValidation = require('../validations/AuthenticationValidation')
 const Joi = require('joi');
+
+jwtSignUser = (user) => {
+  const WEEK = 60 * 60 * 24 * 7;
+  const jwtSecret = process.env.JWT_SECRET || 'secret';
+
+  return jwt.sign(user, jwtSecret, {
+    expiresIn: WEEK,
+  });
+};
 
 router.get('/', (req, res) => {
   res.send({
@@ -103,20 +115,18 @@ router.post('/registration', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    // const user = new User({
-    //   username: req.body.username,
-    //   password: req.body.password,
-    //   email: req.body.email,
-    // });
     const user = await User.findOne({ username: username });
-    const passwordValid = password === user.password;
+    const passwordValid = user.comparePassword(password);
+    console.log(passwordValid)
     if (!user || !passwordValid) {
       return res.status(403).send({
         error: 'The login information was incorrect',
       });
     }
+    const userJson = user.toJSON();
     res.send({
-      user: user.toJSON(),
+      user: userJson,
+      token: jwtSignUser(userJson)  
     });
   } catch (err) {
     res.status(500).send({
