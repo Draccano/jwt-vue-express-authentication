@@ -25,7 +25,7 @@
                         @click="login"
                         type="submit"
                         class="w-full text-center py-3 rounded bg-green-400 text-white hover:bg-green-500 focus:outline-none my-1"
-                    >Create Account</button>
+                    >Login</button>
 
                 </div>
 
