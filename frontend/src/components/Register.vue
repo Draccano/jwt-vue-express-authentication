@@ -50,6 +50,11 @@
 <script>
 import AuthService from '../services/AuthService'
 export default {
+  mounted() {
+    if (this.$store.state.isUserLoggedIn) {
+      this.$router.push({ name: "welcome" });
+    }
+  },
   data() {
     return {
       username: '',
@@ -61,17 +66,21 @@ export default {
   methods: {
     async register() {
       try {
-         const response = await AuthService.register({
+         const resp = await AuthService.register({
           username: this.username,
           password: this.password,
           email: this.email
         })
-        console.log(response)
+        this.$store.dispatch('setToken', resp.data.token)
+        this.$store.dispatch('setUser', resp.data.user)
+        console.log(resp)
         if (this.error) {
           this.error = null
         }
+        this.$router.push({ name: "login" });
+
       } catch (error) {
-          this.error = error.response.data.error
+          this.error = error.resp.data.error
       }
      
     }
