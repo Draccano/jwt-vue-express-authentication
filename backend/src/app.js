@@ -10,8 +10,11 @@ app.use(morgan('combine'));
 app.use(bodyParser.json());
 app.use(cors());
 
-const loginRouter = require('./routes/user')
-app.use('/user', loginRouter)
+const loginRouter = require('./routes/user');
+app.use('/user', loginRouter);
+
+const userMessages = require('./routes/message');
+app.use('/', userMessages);
 
 mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true }, () => {
   console.log('connected to mongo DB');
