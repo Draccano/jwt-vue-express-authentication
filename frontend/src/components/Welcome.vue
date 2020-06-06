@@ -101,13 +101,13 @@ export default {
     },
     async deleteMessage(id, event) {
       console.log(event, id)
-      const response = await MessagesService.delete({messageId: id, userId: this.$store.state.user._id});
+      const response = await MessagesService.delete({messageId: id});
       this.secretMessages = response.data;
     }
   },  
   async mounted() {
     this.userId = this.$store.state.user._id;
-    const response = await MessagesService.index(this.userId);
+    const response = await MessagesService.index();
     this.secretMessages = response.data;
   }
 };
