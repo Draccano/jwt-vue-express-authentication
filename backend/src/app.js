@@ -10,6 +10,8 @@ app.use(morgan('combine'));
 app.use(bodyParser.json());
 app.use(cors());
 
+require('./passport');
+
 const loginRouter = require('./routes/user');
 app.use('/user', loginRouter);
 
